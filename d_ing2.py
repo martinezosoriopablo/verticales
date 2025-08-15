@@ -83,7 +83,7 @@ t_sca = pf(tarifa_sca)
 t_pf  = pf(tarifa_pf)
 
 # Nº clientes para verticales que lo requieren
-n_pf  = round(clientes_totales * pf(pct_cli_pf) * 12)  # fijo por cliente en Pago de Fletes
+n_pf  = round(clientes_totales * pf(pct_cli_pf) )  # fijo por cliente en Pago de Fletes
 n_gp  = round(clientes_totales * pf(pct_cli_gp))  # gateway: tx por cliente
 
 # Ingresos (anuales)
@@ -91,7 +91,7 @@ ingreso_fin = vol_fin * t_fin
 ingreso_fx  = vol_fx  * t_fx
 ingreso_sc  = vol_sc  * t_sc
 ingreso_sca = vol_sca * t_sca
-ingreso_pf  = n_pf * fijo_pf + vol_pf * t_pf
+ingreso_pf  = n_pf * fijo_pf * 12 + vol_pf * t_pf
 ingreso_gp  = n_gp * tx_prom_cli * fee_gp
 
 # Consolidado
@@ -164,7 +164,7 @@ with col2:
     st.markdown(f"- FX: **{tarifa_fx:.2f}%** sobre {pct_carga_fx}% de la carga")
     st.markdown(f"- Seguro Crédito: **{tarifa_sc:.2f}%** sobre {pct_carga_sc}% de la carga")
     st.markdown(f"- Seguro Carga: **{tarifa_sca:.2f}%** sobre {pct_carga_sca}% de la carga")
-    st.markdown(f"- Pago de Fletes: **{fmt_money(fijo_pf)} fijo/cliente** (aplica a {pct_cli_pf}% de clientes) + **{tarifa_pf:.2f}%** sobre % de la carga")
+    st.markdown(f"- Pago de Fletes: **{fmt_money(fijo_pf)} fijo/cliente** (aplica a {pct_cli_pf}% de clientes) + **{tarifa_pf:.2f}%** sobre valor pagado por fletes")
     st.markdown(f"- Gateway de Pago: **{fmt_money(fee_gp)} por transacción** · {pct_cli_gp}% de clientes · **{tx_prom_cli}** tx/cliente/año")
 
 st.markdown("---")
