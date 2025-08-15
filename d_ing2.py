@@ -13,7 +13,7 @@ st.caption("Inputs:% de carga para verticales por volumen. % de clientes ingreso
 # =========================
 with st.sidebar:
     st.header("⚙️ Parámetros Globales")
-    clientes_totales = st.number_input("Clientes actuales", min_value=0, value=150, step=1)
+    clientes_totales = st.number_input("Clientes actuales", min_value=0, value=111, step=1)
     volumen_total = st.number_input("Volumen anual total (USD)", min_value=0.0, value=8_000_000_000.0, step=100_000.0, format="%.2f")
     st.markdown("---")
     st.subheader("Formato")
@@ -35,12 +35,12 @@ st.sidebar.subheader("🎚️ Adopción y Tarifas por Vertical")
 
 # --- Financiamiento ---
 with st.sidebar.expander("💳 Financiamiento", expanded=True):
-    pct_carga_fin = st.slider("% de la carga que se financia", 0, 50, 10, 1)
+    pct_carga_fin = st.slider("% de la carga que se financia", 0, 50, 30, 1)
     tarifa_fin = st.number_input("Tarifa Financiamiento (% sobre monto financiado)", 0.0, 10.0, 0.3, 0.05, format="%.2f")
 
 # --- FX ---
 with st.sidebar.expander("💱 FX", expanded=True):
-    pct_carga_fx = st.slider("% de la carga que pasa por FX", 0, 50, 10, 1, help="Proporción del volumen total que realiza conversión.")
+    pct_carga_fx = st.slider("% de la carga que pasa por FX", 0, 50, 30, 1, help="Proporción del volumen total que realiza conversión.")
     tarifa_fx = st.number_input("Tarifa FX (% sobre monto transado)", 0.0, 10.0, 0.2, 0.05, format="%.2f")
 
 # --- Seguro de Crédito ---
@@ -55,14 +55,13 @@ with st.sidebar.expander("📦 Seguro de Carga", expanded=False):
 
 # --- Pago de Fletes ---
 with st.sidebar.expander("🚢 Pago de Fletes", expanded=True):
-    pct_cli_pf = st.slider("% de clientes que usan Pago de Fletes (para fijo por cliente)", 0, 50, 10, 1)
-    pct_carga_pf = st.slider("% de la carga que pasa por Pago de Fletes (para variable)", 0, 50, 10, 1)
+    pct_cli_pf = st.slider("% de clientes que usan Pago de Fletes (para fijo por cliente)", 0, 100, 30, 1)    
     fijo_pf = st.number_input("Fijo por cliente (USD)", 0.0, 10_000.0, 150.0, 10.0, format="%.2f")
     tarifa_pf = st.number_input("Tarifa variable (% sobre monto de carga)", 0.0, 10.0, 0.5, 0.05, format="%.2f")
 
 # --- Gateway de Pago ---
 with st.sidebar.expander("🏦 Gateway de Pago", expanded=True):
-    pct_cli_gp = st.slider("% de clientes que usan Gateway de Pago", 0, 50, 10, 1)
+    pct_cli_gp = st.slider("% de clientes que usan Gateway de Pago", 25, 100, 50, 1)
     fee_gp = st.number_input("Fee por transacción (USD)", 0.0, 1_000.0, 35.0, 1.0, format="%.2f")
     tx_prom_cli = st.number_input("Transacciones promedio por cliente (al año)", 0, 100_000, 500, 10, help="Usado para proyectar ingresos por gateway.")
 
@@ -74,7 +73,7 @@ vol_fin = volumen_total * pf(pct_carga_fin)
 vol_fx  = volumen_total * pf(pct_carga_fx)
 vol_sc  = volumen_total * pf(pct_carga_sc)
 vol_sca = volumen_total * pf(pct_carga_sca)
-vol_pf  = volumen_total * pf(pct_carga_pf)
+vol_pf  = volumen_total * 0.1 * pct_cli_pf/clientes_totales
 
 # Tarifas como fracciones
 t_fin = pf(tarifa_fin)
@@ -84,7 +83,7 @@ t_sca = pf(tarifa_sca)
 t_pf  = pf(tarifa_pf)
 
 # Nº clientes para verticales que lo requieren
-n_pf  = round(clientes_totales * pf(pct_cli_pf))  # fijo por cliente en Pago de Fletes
+n_pf  = round(clientes_totales * pf(pct_cli_pf) * 12)  # fijo por cliente en Pago de Fletes
 n_gp  = round(clientes_totales * pf(pct_cli_gp))  # gateway: tx por cliente
 
 # Ingresos (anuales)
@@ -165,7 +164,7 @@ with col2:
     st.markdown(f"- FX: **{tarifa_fx:.2f}%** sobre {pct_carga_fx}% de la carga")
     st.markdown(f"- Seguro Crédito: **{tarifa_sc:.2f}%** sobre {pct_carga_sc}% de la carga")
     st.markdown(f"- Seguro Carga: **{tarifa_sca:.2f}%** sobre {pct_carga_sca}% de la carga")
-    st.markdown(f"- Pago de Fletes: **{fmt_money(fijo_pf)} fijo/cliente** (aplica a {pct_cli_pf}% de clientes) + **{tarifa_pf:.2f}%** sobre {pct_carga_pf}% de la carga")
+    st.markdown(f"- Pago de Fletes: **{fmt_money(fijo_pf)} fijo/cliente** (aplica a {pct_cli_pf}% de clientes) + **{tarifa_pf:.2f}%** sobre % de la carga")
     st.markdown(f"- Gateway de Pago: **{fmt_money(fee_gp)} por transacción** · {pct_cli_gp}% de clientes · **{tx_prom_cli}** tx/cliente/año")
 
 st.markdown("---")
